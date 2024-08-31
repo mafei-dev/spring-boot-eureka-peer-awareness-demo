@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  eureka-server-zone-1:
+    image: mafeidev/spring-boot-eureka-peer-awareness-demo-eureka-server
+    build:
+      context: ./eureka-server .
+    container_name: spring-boot-eureka-peer-awareness-demo-eureka-server-zone-1
+    hostname: eureka-server-zone-1
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker-zone1
+  eureka-server-zone-2:
+    image: mafeidev/spring-boot-eureka-peer-awareness-demo-eureka-server
+    build:
+      context: ./eureka-server .
+    container_name: spring-boot-eureka-peer-awareness-demo-eureka-server-zone-2
+    hostname: eureka-server-zone-2
+    ports:
+      - "8762:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker-zone2
+  client-demo-zone-1:
+    image: mafeidev/spring-boot-eureka-peer-awareness-demo-demo-client
+    build:
+      context: ./eureka-client-demo .
+    deploy:
+      mode: replicated
+      replicas: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=zone1
+      - ZONE=zone1
+  client-demo-zone-2:
+    image: mafeidev/spring-boot-eureka-peer-awareness-demo-demo-client
+    build:
+      context: ./eureka-client-demo .
+    deploy:
+      mode: replicated
+      replicas: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=zone2
+      - ZONE=zone2
+  api-gateway:
+    image: mafeidev/spring-boot-eureka-peer-awareness-demo-api-gateway
+    build:
+      context: ./api-gateway .
+    container_name: api-gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8080:8080"
